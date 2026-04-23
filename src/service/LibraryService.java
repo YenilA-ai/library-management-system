@@ -48,7 +48,7 @@ public class LibraryService {
         Transaction transaction = new Transaction(bookId, memberId, borrowDate, dueDate);
         transactions.add(transaction);
 
-        System.out.println("Book borrowed successfully. Due date: " + dueDate);
+        System.out.println("Book borrowed. Due date: " + dueDate);
     }
 
     // Return Book
@@ -62,7 +62,7 @@ public class LibraryService {
                     book.setAvailable(true);
                 }
 
-                System.out.println("Book returned successfully");
+                System.out.println("Book returned");
                 return;
             }
         }
@@ -70,7 +70,46 @@ public class LibraryService {
         System.out.println("No active transaction found");
     }
 
-    // Helper method
+    // Show all books
+    public void showAllBooks() {
+        System.out.println("\nAll Books:");
+        for (Book b : books) {
+            System.out.println(b.getId() + " - " + b.getTitle() + " - Available: " + b.isAvailable());
+        }
+    }
+
+    // Show all members
+    public void showAllMembers() {
+        System.out.println("\nAll Members:");
+        for (Member m : members) {
+            System.out.println(m.getId() + " - " + m.getName());
+        }
+    }
+
+    // Show borrowed books
+    public void showBorrowedBooks() {
+        System.out.println("\nBorrowed Books:");
+        for (Transaction t : transactions) {
+            if (!t.isReturned()) {
+                System.out.println("Book ID: " + t.getBookId() +
+                        ", Member ID: " + t.getMemberId() +
+                        ", Due: " + t.getDueDate());
+            }
+        }
+    }
+
+    // Show overdue books
+    public void showOverdueBooks() {
+        System.out.println("\nOverdue Books:");
+        for (Transaction t : transactions) {
+            if (!t.isReturned() && t.getDueDate().isBefore(LocalDate.now())) {
+                System.out.println("Book ID: " + t.getBookId() +
+                        ", Member ID: " + t.getMemberId());
+            }
+        }
+    }
+
+    // Helper
     private Book findBook(int id) {
         for (Book b : books) {
             if (b.getId() == id) {

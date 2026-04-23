@@ -17,10 +17,20 @@ public class Main {
         library.addMember(new Member(1, "Alice"));
         library.addMember(new Member(2, "Bob"));
 
-        // Borrow book
+        // Show initial data
+        library.showAllBooks();
+        library.showAllMembers();
+
+        // Borrow
         library.borrowBook(1, 1);
 
-        // Return book
+        // Show borrowed
+        library.showBorrowedBooks();
+
+        // Return
         library.returnBook(1);
+
+        // Show updated data
+        library.showAllBooks();
     }
 }
