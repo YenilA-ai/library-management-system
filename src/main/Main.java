@@ -13,7 +13,6 @@ public class Main {
         LibraryService library = new LibraryService();
         Scanner scanner = new Scanner(System.in);
 
-        // Sample data
         library.addBook(new Book(1, "Java Basics", "John Smith"));
         library.addBook(new Book(2, "OOP Concepts", "Jane Doe"));
 
@@ -30,12 +29,14 @@ public class Main {
             System.out.println("4. Return book");
             System.out.println("5. Show borrowed books");
             System.out.println("6. Show overdue books");
+            System.out.println("7. Search book");
             System.out.println("0. Exit");
 
             System.out.print("Enter choice: ");
 
             try {
                 choice = scanner.nextInt();
+                scanner.nextLine(); // fix input issue
 
                 switch (choice) {
                     case 1:
@@ -62,6 +63,12 @@ public class Main {
                         library.showOverdueBooks();
                         break;
 
+                    case 7:
+                        System.out.print("Enter keyword: ");
+                        String keyword = scanner.nextLine();
+                        library.searchBook(keyword);
+                        break;
+
                     case 0:
                         System.out.println("Exiting system...");
                         break;
@@ -71,8 +78,8 @@ public class Main {
                 }
 
             } catch (InputMismatchException e) {
-                System.out.println("Invalid input. Please enter numbers only.");
-                scanner.nextLine(); // clear invalid input
+                System.out.println("Invalid input. Enter numbers only.");
+                scanner.nextLine();
             }
 
         } while (choice != 0);
@@ -91,20 +98,20 @@ public class Main {
             library.borrowBook(bookId, memberId);
 
         } catch (InputMismatchException e) {
-            System.out.println("Invalid input. Please enter valid numbers.");
+            System.out.println("Invalid input");
             scanner.nextLine();
         }
     }
 
     private static void handleReturn(Scanner scanner, LibraryService library) {
         try {
-            System.out.print("Enter Book ID to return: ");
+            System.out.print("Enter Book ID: ");
             int bookId = scanner.nextInt();
 
             library.returnBook(bookId);
 
         } catch (InputMismatchException e) {
-            System.out.println("Invalid input. Please enter a valid number.");
+            System.out.println("Invalid input");
             scanner.nextLine();
         }
     }

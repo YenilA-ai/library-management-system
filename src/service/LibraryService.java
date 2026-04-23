@@ -14,19 +14,16 @@ public class LibraryService {
     private List<Member> members = new ArrayList<>();
     private List<Transaction> transactions = new ArrayList<>();
 
-    // Add Book
     public void addBook(Book book) {
         books.add(book);
         System.out.println("Book added: " + book.getTitle());
     }
 
-    // Add Member
     public void addMember(Member member) {
         members.add(member);
         System.out.println("Member added: " + member.getName());
     }
 
-    // Borrow Book
     public void borrowBook(int bookId, int memberId) {
         Book book = findBook(bookId);
 
@@ -36,7 +33,7 @@ public class LibraryService {
         }
 
         if (!book.isAvailable()) {
-            System.out.println("Book is already borrowed");
+            System.out.println("Book already borrowed");
             return;
         }
 
@@ -45,13 +42,12 @@ public class LibraryService {
         LocalDate borrowDate = LocalDate.now();
         LocalDate dueDate = borrowDate.plusDays(14);
 
-        Transaction transaction = new Transaction(bookId, memberId, borrowDate, dueDate);
-        transactions.add(transaction);
+        Transaction t = new Transaction(bookId, memberId, borrowDate, dueDate);
+        transactions.add(t);
 
-        System.out.println("Book borrowed. Due date: " + dueDate);
+        System.out.println("Borrowed. Due date: " + dueDate);
     }
 
-    // Return Book
     public void returnBook(int bookId) {
         for (Transaction t : transactions) {
             if (t.getBookId() == bookId && !t.isReturned()) {
@@ -62,7 +58,7 @@ public class LibraryService {
                     book.setAvailable(true);
                 }
 
-                System.out.println("Book returned");
+                System.out.println("Returned successfully");
                 return;
             }
         }
@@ -70,7 +66,6 @@ public class LibraryService {
         System.out.println("No active transaction found");
     }
 
-    // Show all books
     public void showAllBooks() {
         System.out.println("\nAll Books:");
         for (Book b : books) {
@@ -78,7 +73,6 @@ public class LibraryService {
         }
     }
 
-    // Show all members
     public void showAllMembers() {
         System.out.println("\nAll Members:");
         for (Member m : members) {
@@ -86,7 +80,6 @@ public class LibraryService {
         }
     }
 
-    // Show borrowed books
     public void showBorrowedBooks() {
         System.out.println("\nBorrowed Books:");
         for (Transaction t : transactions) {
@@ -98,7 +91,6 @@ public class LibraryService {
         }
     }
 
-    // Show overdue books
     public void showOverdueBooks() {
         System.out.println("\nOverdue Books:");
         for (Transaction t : transactions) {
@@ -109,12 +101,19 @@ public class LibraryService {
         }
     }
 
-    // Helper
+    // NEW: Search book by title
+    public void searchBook(String keyword) {
+        System.out.println("\nSearch Results:");
+        for (Book b : books) {
+            if (b.getTitle().toLowerCase().contains(keyword.toLowerCase())) {
+                System.out.println(b.getId() + " - " + b.getTitle());
+            }
+        }
+    }
+
     private Book findBook(int id) {
         for (Book b : books) {
-            if (b.getId() == id) {
-                return b;
-            }
+            if (b.getId() == id) return b;
         }
         return null;
     }
