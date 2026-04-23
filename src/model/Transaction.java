@@ -2,14 +2,14 @@ package model;
 
 import java.time.LocalDate;
 
-public class Transcation {
+public class Transaction {
     private int bookId;
     private int memberId;
     private LocalDate borrowDate;
     private LocalDate dueDate;
     private boolean returned;
 
-    public Transcation(int bookId, int memberId, LocalDate borrowDate, LocalDate dueDate) {
+    public Transaction(int bookId, int memberId, LocalDate borrowDate, LocalDate dueDate) {
         this.bookId = bookId;
         this.memberId = memberId;
         this.borrowDate = borrowDate;
