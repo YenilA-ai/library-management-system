@@ -4,6 +4,7 @@ import model.Book;
 import model.Member;
 import service.LibraryService;
 
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Main {
@@ -19,7 +20,7 @@ public class Main {
         library.addMember(new Member(1, "Alice"));
         library.addMember(new Member(2, "Bob"));
 
-        int choice;
+        int choice = -1;
 
         do {
             System.out.println("\n=== Library Menu ===");
@@ -32,52 +33,79 @@ public class Main {
             System.out.println("0. Exit");
 
             System.out.print("Enter choice: ");
-            choice = scanner.nextInt();
 
-            switch (choice) {
-                case 1:
-                    library.showAllBooks();
-                    break;
+            try {
+                choice = scanner.nextInt();
 
-                case 2:
-                    library.showAllMembers();
-                    break;
+                switch (choice) {
+                    case 1:
+                        library.showAllBooks();
+                        break;
 
-                case 3:
-                    System.out.print("Enter Book ID: ");
-                    int bookId = scanner.nextInt();
+                    case 2:
+                        library.showAllMembers();
+                        break;
 
-                    System.out.print("Enter Member ID: ");
-                    int memberId = scanner.nextInt();
+                    case 3:
+                        handleBorrow(scanner, library);
+                        break;
 
-                    library.borrowBook(bookId, memberId);
-                    break;
+                    case 4:
+                        handleReturn(scanner, library);
+                        break;
 
-                case 4:
-                    System.out.print("Enter Book ID to return: ");
-                    int returnId = scanner.nextInt();
+                    case 5:
+                        library.showBorrowedBooks();
+                        break;
 
-                    library.returnBook(returnId);
-                    break;
+                    case 6:
+                        library.showOverdueBooks();
+                        break;
 
-                case 5:
-                    library.showBorrowedBooks();
-                    break;
+                    case 0:
+                        System.out.println("Exiting system...");
+                        break;
 
-                case 6:
-                    library.showOverdueBooks();
-                    break;
+                    default:
+                        System.out.println("Invalid choice");
+                }
 
-                case 0:
-                    System.out.println("Exiting system...");
-                    break;
-
-                default:
-                    System.out.println("Invalid choice");
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter numbers only.");
+                scanner.nextLine(); // clear invalid input
             }
 
         } while (choice != 0);
 
         scanner.close();
+    }
+
+    private static void handleBorrow(Scanner scanner, LibraryService library) {
+        try {
+            System.out.print("Enter Book ID: ");
+            int bookId = scanner.nextInt();
+
+            System.out.print("Enter Member ID: ");
+            int memberId = scanner.nextInt();
+
+            library.borrowBook(bookId, memberId);
+
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input. Please enter valid numbers.");
+            scanner.nextLine();
+        }
+    }
+
+    private static void handleReturn(Scanner scanner, LibraryService library) {
+        try {
+            System.out.print("Enter Book ID to return: ");
+            int bookId = scanner.nextInt();
+
+            library.returnBook(bookId);
+
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input. Please enter a valid number.");
+            scanner.nextLine();
+        }
     }
 }
