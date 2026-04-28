@@ -21,6 +21,7 @@ public class LibraryService {
         loadBooks();
     }
 
+    // ================= ADD =================
     public void addBook(Book book) {
         books.add(book);
         saveBooks();
@@ -32,6 +33,7 @@ public class LibraryService {
         System.out.println("Member added: " + member.getName());
     }
 
+    // ================= BORROW =================
     public void borrowBook(int bookId, int memberId) {
         Book book = findBook(bookId);
 
@@ -56,6 +58,7 @@ public class LibraryService {
         System.out.println("Borrowed. Due: " + dueDate);
     }
 
+    // ================= RETURN =================
     public void returnBook(int bookId) {
         for (Transaction t : transactions) {
             if (t.getBookId() == bookId && !t.isReturned()) {
@@ -75,47 +78,37 @@ public class LibraryService {
         System.out.println("No active transaction");
     }
 
+    // ================= DISPLAY =================
     public void showAllBooks() {
-        System.out.println("\nBooks:");
         for (Book b : books) {
-            System.out.println(b.getId() + " - " + b.getTitle() + " - Available: " + b.isAvailable());
+            System.out.println(b.getId() + " - " + b.getTitle());
         }
     }
 
     public void showAllMembers() {
-        System.out.println("\nMembers:");
         for (Member m : members) {
             System.out.println(m.getId() + " - " + m.getName());
         }
     }
 
     public void showBorrowedBooks() {
-        System.out.println("\nBorrowed:");
         for (Transaction t : transactions) {
             if (!t.isReturned()) {
-                System.out.println("Book: " + t.getBookId() + ", Due: " + t.getDueDate());
+                System.out.println("Book: " + t.getBookId() + " Due: " + t.getDueDate());
             }
         }
     }
 
-    public void showOverdueBooks() {
-        System.out.println("\nOverdue:");
-        for (Transaction t : transactions) {
-            if (!t.isReturned() && t.getDueDate().isBefore(LocalDate.now())) {
-                System.out.println("Book: " + t.getBookId());
-            }
-        }
-    }
-
+    // ================= SEARCH =================
     public void searchBook(String keyword) {
-        System.out.println("\nSearch:");
         for (Book b : books) {
             if (b.getTitle().toLowerCase().contains(keyword.toLowerCase())) {
-                System.out.println(b.getId() + " - " + b.getTitle());
+                System.out.println(b.getTitle());
             }
         }
     }
 
+    // ================= FIND =================
     private Book findBook(int id) {
         for (Book b : books) {
             if (b.getId() == id) return b;
@@ -123,7 +116,7 @@ public class LibraryService {
         return null;
     }
 
-    // SAVE
+    // ================= FILE SAVE =================
     private void saveBooks() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(BOOK_FILE))) {
             for (Book b : books) {
@@ -135,7 +128,6 @@ public class LibraryService {
         }
     }
 
-    // LOAD
     private void loadBooks() {
         File file = new File(BOOK_FILE);
         if (!file.exists()) return;
@@ -148,5 +140,18 @@ public class LibraryService {
         } catch (IOException e) {
             System.out.println("Error loading books");
         }
+    }
+
+    // ================= IMPORTANT FIX =================
+    public List<Book> getBooks() {
+        return books;
+    }
+
+    public List<Member> getMembers() {
+        return members;
+    }
+
+    public List<Transaction> getTransactions() {
+        return transactions;
     }
 }

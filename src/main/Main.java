@@ -4,115 +4,152 @@ import model.Book;
 import model.Member;
 import service.LibraryService;
 
-import java.util.InputMismatchException;
-import java.util.Scanner;
+import javax.swing.*;
+import java.awt.*;
 
 public class Main {
+
+    private static LibraryService library = new LibraryService();
+    private static JTextArea outputArea;
+
     public static void main(String[] args) {
 
-        LibraryService library = new LibraryService();
-        Scanner scanner = new Scanner(System.in);
-
-        library.addBook(new Book(1, "Java Basics", "John Smith"));
-        library.addBook(new Book(2, "OOP Concepts", "Jane Doe"));
+        // Sample data
 
         library.addMember(new Member(1, "Alice"));
         library.addMember(new Member(2, "Bob"));
+        library.addMember(new Member(3, "Yenil"));
 
-        int choice = -1;
+        // Frame
+        JFrame frame = new JFrame("Library Management System");
+        frame.setSize(600, 550);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLayout(new BorderLayout(10, 10));
 
-        do {
-            System.out.println("\n=== Library Menu ===");
-            System.out.println("1. Show all books");
-            System.out.println("2. Show all members");
-            System.out.println("3. Borrow book");
-            System.out.println("4. Return book");
-            System.out.println("5. Show borrowed books");
-            System.out.println("6. Show overdue books");
-            System.out.println("7. Search book");
-            System.out.println("0. Exit");
+        // Colors
+        Color bgColor = new Color(30, 30, 30);
+        Color panelColor = new Color(45, 45, 45);
+        Color btnColor = new Color(70, 130, 180);
+        Color textColor = Color.WHITE;
 
-            System.out.print("Enter choice: ");
+        frame.getContentPane().setBackground(bgColor);
 
-            try {
-                choice = scanner.nextInt();
-                scanner.nextLine(); // fix input issue
+        // Title
+        JLabel title = new JLabel("Library Management System", JLabel.CENTER);
+        title.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        title.setForeground(textColor);
+        title.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        frame.add(title, BorderLayout.NORTH);
 
-                switch (choice) {
-                    case 1:
-                        library.showAllBooks();
-                        break;
+        // Button panel
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(3, 2, 15, 15));
+        panel.setBackground(panelColor);
+        panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-                    case 2:
-                        library.showAllMembers();
-                        break;
+        JButton viewBooks = createButton("View Books", btnColor);
+        JButton viewMembers = createButton("View Members", btnColor);
+        JButton borrowBook = createButton("Borrow Book", btnColor);
+        JButton returnBook = createButton("Return Book", btnColor);
+        JButton searchBook = createButton("Search Book", btnColor);
+        JButton showBorrowed = createButton("Borrowed Books", btnColor);
 
-                    case 3:
-                        handleBorrow(scanner, library);
-                        break;
+        panel.add(viewBooks);
+        panel.add(viewMembers);
+        panel.add(borrowBook);
+        panel.add(returnBook);
+        panel.add(searchBook);
+        panel.add(showBorrowed);
 
-                    case 4:
-                        handleReturn(scanner, library);
-                        break;
+        frame.add(panel, BorderLayout.CENTER);
 
-                    case 5:
-                        library.showBorrowedBooks();
-                        break;
+        // Output area
+        outputArea = new JTextArea();
+        outputArea.setEditable(false);
+        outputArea.setFont(new Font("Consolas", Font.PLAIN, 13));
+        outputArea.setBackground(new Color(20, 20, 20));
+        outputArea.setForeground(Color.GREEN);
+        outputArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-                    case 6:
-                        library.showOverdueBooks();
-                        break;
+        JScrollPane scrollPane = new JScrollPane(outputArea);
+        scrollPane.setPreferredSize(new Dimension(600, 220));
 
-                    case 7:
-                        System.out.print("Enter keyword: ");
-                        String keyword = scanner.nextLine();
-                        library.searchBook(keyword);
-                        break;
+        frame.add(scrollPane, BorderLayout.SOUTH);
 
-                    case 0:
-                        System.out.println("Exiting system...");
-                        break;
+        // Actions
 
-                    default:
-                        System.out.println("Invalid choice");
-                }
-
-            } catch (InputMismatchException e) {
-                System.out.println("Invalid input. Enter numbers only.");
-                scanner.nextLine();
+        viewBooks.addActionListener(e -> {
+            outputArea.setText("=== Books ===\n");
+            for (Book b : library.getBooks()) {
+                outputArea.append(b.getId() + " | " + b.getTitle() +
+                        " | Available: " + b.isAvailable() + "\n");
             }
+        });
 
-        } while (choice != 0);
+        viewMembers.addActionListener(e -> {
+            outputArea.setText("=== Members ===\n");
+            for (Member m : library.getMembers()) {
+                outputArea.append(m.getId() + " | " + m.getName() + "\n");
+            }
+        });
 
-        scanner.close();
+        borrowBook.addActionListener(e -> {
+            try {
+                int bookId = Integer.parseInt(JOptionPane.showInputDialog("Book ID"));
+                int memberId = Integer.parseInt(JOptionPane.showInputDialog("Member ID"));
+
+                library.borrowBook(bookId, memberId);
+                outputArea.append("✔ Book borrowed successfully\n");
+
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(frame, "Invalid input");
+            }
+        });
+
+        returnBook.addActionListener(e -> {
+            try {
+                int bookId = Integer.parseInt(JOptionPane.showInputDialog("Book ID"));
+
+                library.returnBook(bookId);
+                outputArea.append("✔ Book returned successfully\n");
+
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(frame, "Invalid input");
+            }
+        });
+
+        searchBook.addActionListener(e -> {
+            String keyword = JOptionPane.showInputDialog("Enter keyword");
+
+            outputArea.setText("=== Search Results ===\n");
+            for (Book b : library.getBooks()) {
+                if (b.getTitle().toLowerCase().contains(keyword.toLowerCase())) {
+                    outputArea.append(b.getId() + " | " + b.getTitle() + "\n");
+                }
+            }
+        });
+
+        showBorrowed.addActionListener(e -> {
+            outputArea.setText("=== Borrowed Books ===\n");
+            library.getTransactions().stream()
+                    .filter(t -> !t.isReturned())
+                    .forEach(t -> outputArea.append(
+                            "Book: " + t.getBookId() +
+                                    " | Due: " + t.getDueDate() + "\n"
+                    ));
+        });
+
+        frame.setVisible(true);
     }
 
-    private static void handleBorrow(Scanner scanner, LibraryService library) {
-        try {
-            System.out.print("Enter Book ID: ");
-            int bookId = scanner.nextInt();
-
-            System.out.print("Enter Member ID: ");
-            int memberId = scanner.nextInt();
-
-            library.borrowBook(bookId, memberId);
-
-        } catch (InputMismatchException e) {
-            System.out.println("Invalid input");
-            scanner.nextLine();
-        }
-    }
-
-    private static void handleReturn(Scanner scanner, LibraryService library) {
-        try {
-            System.out.print("Enter Book ID: ");
-            int bookId = scanner.nextInt();
-
-            library.returnBook(bookId);
-
-        } catch (InputMismatchException e) {
-            System.out.println("Invalid input");
-            scanner.nextLine();
-        }
+    // Button styling
+    private static JButton createButton(String text, Color bg) {
+        JButton button = new JButton(text);
+        button.setFocusPainted(false);
+        button.setBackground(bg);
+        button.setForeground(Color.WHITE);
+        button.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        button.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        return button;
     }
 }
