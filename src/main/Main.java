@@ -15,7 +15,7 @@ public class Main {
     public static void main(String[] args) {
 
         JFrame frame = new JFrame("Library Management System");
-        frame.setSize(600, 550);
+        frame.setSize(650, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout(10, 10));
 
@@ -32,11 +32,13 @@ public class Main {
         frame.add(title, BorderLayout.NORTH);
 
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(4, 2, 15, 15));
+        panel.setLayout(new GridLayout(5, 2, 15, 15));
         panel.setBackground(panelColor);
         panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
         JButton addBook = createButton("Add Book", btnColor);
+        JButton deleteBook = createButton("Delete Book", btnColor);
+        JButton addMember = createButton("Add Member", btnColor);
         JButton viewBooks = createButton("View Books", btnColor);
         JButton viewMembers = createButton("View Members", btnColor);
         JButton borrowBook = createButton("Borrow Book", btnColor);
@@ -45,6 +47,8 @@ public class Main {
         JButton showBorrowed = createButton("Borrowed Books", btnColor);
 
         panel.add(addBook);
+        panel.add(deleteBook);
+        panel.add(addMember);
         panel.add(viewBooks);
         panel.add(viewMembers);
         panel.add(borrowBook);
@@ -62,18 +66,61 @@ public class Main {
         outputArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         JScrollPane scrollPane = new JScrollPane(outputArea);
-        scrollPane.setPreferredSize(new Dimension(600, 220));
+        scrollPane.setPreferredSize(new Dimension(650, 220));
         frame.add(scrollPane, BorderLayout.SOUTH);
 
         // ================= ADD BOOK =================
         addBook.addActionListener(e -> {
             try {
                 int id = Integer.parseInt(JOptionPane.showInputDialog("Book ID"));
+
+                for (Book b : library.getBooks()) {
+                    if (b.getId() == id) {
+                        JOptionPane.showMessageDialog(frame, "Book ID already exists");
+                        return;
+                    }
+                }
+
                 String titleInput = JOptionPane.showInputDialog("Title");
                 String author = JOptionPane.showInputDialog("Author");
 
                 library.addBook(new Book(id, titleInput, author));
-                outputArea.append("✔ Book added successfully\n");
+                outputArea.append("✔ Book added\n");
+
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(frame, "Invalid input");
+            }
+        });
+
+        // ================= DELETE BOOK =================
+        deleteBook.addActionListener(e -> {
+            try {
+                int id = Integer.parseInt(JOptionPane.showInputDialog("Book ID to delete"));
+
+                library.getBooks().removeIf(b -> b.getId() == id);
+                outputArea.append("✔ Book deleted (if existed)\n");
+
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(frame, "Invalid input");
+            }
+        });
+
+        // ================= ADD MEMBER =================
+        addMember.addActionListener(e -> {
+            try {
+                int id = Integer.parseInt(JOptionPane.showInputDialog("Member ID"));
+
+                for (Member m : library.getMembers()) {
+                    if (m.getId() == id) {
+                        JOptionPane.showMessageDialog(frame, "Member ID exists");
+                        return;
+                    }
+                }
+
+                String name = JOptionPane.showInputDialog("Name");
+
+                library.addMember(new Member(id, name));
+                outputArea.append("✔ Member added\n");
 
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(frame, "Invalid input");
@@ -103,7 +150,7 @@ public class Main {
                 int memberId = Integer.parseInt(JOptionPane.showInputDialog("Member ID"));
 
                 library.borrowBook(bookId, memberId);
-                outputArea.append("✔ Book borrowed\n");
+                outputArea.append("✔ Borrowed\n");
 
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(frame, "Invalid input");
@@ -116,7 +163,7 @@ public class Main {
                 int bookId = Integer.parseInt(JOptionPane.showInputDialog("Book ID"));
 
                 library.returnBook(bookId);
-                outputArea.append("✔ Book returned\n");
+                outputArea.append("✔ Returned\n");
 
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(frame, "Invalid input");
@@ -125,9 +172,9 @@ public class Main {
 
         // ================= SEARCH =================
         searchBook.addActionListener(e -> {
-            String keyword = JOptionPane.showInputDialog("Enter keyword");
+            String keyword = JOptionPane.showInputDialog("Keyword");
 
-            outputArea.setText("=== Search Results ===\n");
+            outputArea.setText("=== Search ===\n");
             for (Book b : library.getBooks()) {
                 if (b.getTitle().toLowerCase().contains(keyword.toLowerCase())) {
                     outputArea.append(b.getId() + " | " + b.getTitle() + "\n");
@@ -137,7 +184,7 @@ public class Main {
 
         // ================= BORROWED =================
         showBorrowed.addActionListener(e -> {
-            outputArea.setText("=== Borrowed Books ===\n");
+            outputArea.setText("=== Borrowed ===\n");
             library.getTransactions().stream()
                     .filter(t -> !t.isReturned())
                     .forEach(t -> outputArea.append(
