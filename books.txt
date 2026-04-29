@@ -1,3 +1,1 @@
-1,Java Basics,John Smith,true
 2,OOP Concepts,Jane Doe,true
-3,Harry,Yenil,true

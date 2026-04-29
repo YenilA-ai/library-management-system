@@ -17,34 +17,20 @@ public class Main {
         JFrame frame = new JFrame("Library Management System");
         frame.setSize(650, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLayout(new BorderLayout(10, 10));
+        frame.setLayout(new BorderLayout());
 
-        Color bgColor = new Color(30, 30, 30);
-        Color panelColor = new Color(45, 45, 45);
-        Color btnColor = new Color(70, 130, 180);
+        JPanel panel = new JPanel(new GridLayout(5, 2, 10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        frame.getContentPane().setBackground(bgColor);
-
-        JLabel title = new JLabel("Library Management System", JLabel.CENTER);
-        title.setFont(new Font("Segoe UI", Font.BOLD, 22));
-        title.setForeground(Color.WHITE);
-        title.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
-        frame.add(title, BorderLayout.NORTH);
-
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(5, 2, 15, 15));
-        panel.setBackground(panelColor);
-        panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-
-        JButton addBook = createButton("Add Book", btnColor);
-        JButton deleteBook = createButton("Delete Book", btnColor);
-        JButton addMember = createButton("Add Member", btnColor);
-        JButton viewBooks = createButton("View Books", btnColor);
-        JButton viewMembers = createButton("View Members", btnColor);
-        JButton borrowBook = createButton("Borrow Book", btnColor);
-        JButton returnBook = createButton("Return Book", btnColor);
-        JButton searchBook = createButton("Search Book", btnColor);
-        JButton showBorrowed = createButton("Borrowed Books", btnColor);
+        JButton addBook = new JButton("Add Book");
+        JButton deleteBook = new JButton("Delete Book");
+        JButton addMember = new JButton("Add Member");
+        JButton viewBooks = new JButton("View Books");
+        JButton viewMembers = new JButton("View Members");
+        JButton borrowBook = new JButton("Borrow Book");
+        JButton returnBook = new JButton("Return Book");
+        JButton searchBook = new JButton("Search Book");
+        JButton showBorrowed = new JButton("Borrowed Books");
 
         panel.add(addBook);
         panel.add(deleteBook);
@@ -56,153 +42,161 @@ public class Main {
         panel.add(searchBook);
         panel.add(showBorrowed);
 
-        frame.add(panel, BorderLayout.CENTER);
+        frame.add(panel, BorderLayout.NORTH);
 
         outputArea = new JTextArea();
         outputArea.setEditable(false);
-        outputArea.setFont(new Font("Consolas", Font.PLAIN, 13));
-        outputArea.setBackground(new Color(20, 20, 20));
-        outputArea.setForeground(Color.GREEN);
-        outputArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        outputArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        frame.add(new JScrollPane(outputArea), BorderLayout.CENTER);
 
-        JScrollPane scrollPane = new JScrollPane(outputArea);
-        scrollPane.setPreferredSize(new Dimension(650, 220));
-        frame.add(scrollPane, BorderLayout.SOUTH);
-
-        // ================= ADD BOOK =================
+        // ===== ADD BOOK =====
         addBook.addActionListener(e -> {
-            try {
-                int id = Integer.parseInt(JOptionPane.showInputDialog("Book ID"));
+            JTextField id = new JTextField();
+            JTextField title = new JTextField();
+            JTextField author = new JTextField();
 
-                for (Book b : library.getBooks()) {
-                    if (b.getId() == id) {
-                        JOptionPane.showMessageDialog(frame, "Book ID already exists");
-                        return;
-                    }
+            Object[] fields = {
+                    "Book ID:", id,
+                    "Title:", title,
+                    "Author:", author
+            };
+
+            if (JOptionPane.showConfirmDialog(null, fields, "Add Book",
+                    JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+
+                try {
+                    library.addBook(new Book(
+                            Integer.parseInt(id.getText()),
+                            title.getText(),
+                            author.getText()
+                    ));
+                    outputArea.setText("Book added successfully\n");
+
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(frame, "Invalid input");
                 }
-
-                String titleInput = JOptionPane.showInputDialog("Title");
-                String author = JOptionPane.showInputDialog("Author");
-
-                library.addBook(new Book(id, titleInput, author));
-                outputArea.append("✔ Book added\n");
-
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Invalid input");
             }
         });
 
-        // ================= DELETE BOOK =================
+        // ===== DELETE BOOK =====
         deleteBook.addActionListener(e -> {
-            try {
-                int id = Integer.parseInt(JOptionPane.showInputDialog("Book ID to delete"));
+            String input = JOptionPane.showInputDialog("Enter Book ID to delete");
 
-                library.getBooks().removeIf(b -> b.getId() == id);
-                outputArea.append("✔ Book deleted (if existed)\n");
+            try {
+                int id = Integer.parseInt(input);
+                library.deleteBook(id);
+                outputArea.setText("Book deleted successfully\n");
 
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(frame, "Invalid input");
             }
         });
 
-        // ================= ADD MEMBER =================
+        // ===== ADD MEMBER =====
         addMember.addActionListener(e -> {
-            try {
-                int id = Integer.parseInt(JOptionPane.showInputDialog("Member ID"));
+            JTextField id = new JTextField();
+            JTextField name = new JTextField();
 
-                for (Member m : library.getMembers()) {
-                    if (m.getId() == id) {
-                        JOptionPane.showMessageDialog(frame, "Member ID exists");
-                        return;
-                    }
+            Object[] fields = {
+                    "Member ID:", id,
+                    "Name:", name
+            };
+
+            if (JOptionPane.showConfirmDialog(null, fields, "Add Member",
+                    JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+
+                try {
+                    library.addMember(new Member(
+                            Integer.parseInt(id.getText()),
+                            name.getText()
+                    ));
+                    outputArea.setText("Member added successfully\n");
+
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(frame, "Invalid input");
                 }
-
-                String name = JOptionPane.showInputDialog("Name");
-
-                library.addMember(new Member(id, name));
-                outputArea.append("✔ Member added\n");
-
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Invalid input");
             }
         });
 
-        // ================= VIEW =================
+        // ===== VIEW BOOKS =====
         viewBooks.addActionListener(e -> {
             outputArea.setText("=== Books ===\n");
             for (Book b : library.getBooks()) {
-                outputArea.append(b.getId() + " | " + b.getTitle() +
-                        " | Available: " + b.isAvailable() + "\n");
+                outputArea.append(b.getId() + " - " + b.getTitle() +
+                        " - Available: " + b.isAvailable() + "\n");
             }
         });
 
+        // ===== VIEW MEMBERS =====
         viewMembers.addActionListener(e -> {
             outputArea.setText("=== Members ===\n");
             for (Member m : library.getMembers()) {
-                outputArea.append(m.getId() + " | " + m.getName() + "\n");
+                outputArea.append(m.getId() + " - " + m.getName() + "\n");
             }
         });
 
-        // ================= BORROW =================
+        // ===== BORROW =====
         borrowBook.addActionListener(e -> {
-            try {
-                int bookId = Integer.parseInt(JOptionPane.showInputDialog("Book ID"));
-                int memberId = Integer.parseInt(JOptionPane.showInputDialog("Member ID"));
+            JTextField bookId = new JTextField();
+            JTextField memberId = new JTextField();
 
-                library.borrowBook(bookId, memberId);
-                outputArea.append("✔ Borrowed\n");
+            Object[] fields = {
+                    "Book ID:", bookId,
+                    "Member ID:", memberId
+            };
 
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Invalid input");
-            }
-        });
+            if (JOptionPane.showConfirmDialog(null, fields, "Borrow Book",
+                    JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 
-        // ================= RETURN =================
-        returnBook.addActionListener(e -> {
-            try {
-                int bookId = Integer.parseInt(JOptionPane.showInputDialog("Book ID"));
+                try {
+                    library.borrowBook(
+                            Integer.parseInt(bookId.getText()),
+                            Integer.parseInt(memberId.getText())
+                    );
+                    outputArea.setText("Book borrowed successfully\n");
 
-                library.returnBook(bookId);
-                outputArea.append("✔ Returned\n");
-
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Invalid input");
-            }
-        });
-
-        // ================= SEARCH =================
-        searchBook.addActionListener(e -> {
-            String keyword = JOptionPane.showInputDialog("Keyword");
-
-            outputArea.setText("=== Search ===\n");
-            for (Book b : library.getBooks()) {
-                if (b.getTitle().toLowerCase().contains(keyword.toLowerCase())) {
-                    outputArea.append(b.getId() + " | " + b.getTitle() + "\n");
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(frame, "Invalid input");
                 }
             }
         });
 
-        // ================= BORROWED =================
+        // ===== RETURN =====
+        returnBook.addActionListener(e -> {
+            String input = JOptionPane.showInputDialog("Enter Book ID");
+
+            try {
+                library.returnBook(Integer.parseInt(input));
+                outputArea.setText("Book returned successfully\n");
+
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(frame, "Invalid input");
+            }
+        });
+
+        // ===== SEARCH =====
+        searchBook.addActionListener(e -> {
+            String keyword = JOptionPane.showInputDialog("Enter keyword");
+
+            outputArea.setText("=== Search Results ===\n");
+            for (Book b : library.getBooks()) {
+                if (b.getTitle().toLowerCase().contains(keyword.toLowerCase())) {
+                    outputArea.append(b.getId() + " - " + b.getTitle() + "\n");
+                }
+            }
+        });
+
+        // ===== BORROWED =====
         showBorrowed.addActionListener(e -> {
-            outputArea.setText("=== Borrowed ===\n");
+            outputArea.setText("=== Borrowed Books ===\n");
             library.getTransactions().stream()
                     .filter(t -> !t.isReturned())
-                    .forEach(t -> outputArea.append(
-                            "Book: " + t.getBookId() +
-                                    " | Due: " + t.getDueDate() + "\n"
-                    ));
+                    .forEach(t ->
+                            outputArea.append("Book ID: " + t.getBookId() +
+                                    " | Due: " + t.getDueDate() + "\n")
+                    );
         });
 
         frame.setVisible(true);
-    }
-
-    private static JButton createButton(String text, Color bg) {
-        JButton button = new JButton(text);
-        button.setFocusPainted(false);
-        button.setBackground(bg);
-        button.setForeground(Color.WHITE);
-        button.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        button.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        return button;
     }
 }
