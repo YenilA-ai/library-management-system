@@ -17,12 +17,19 @@ public class Main {
     public static void main(String[] args) {
 
         JFrame frame = new JFrame("Library Management System");
-        frame.setSize(700, 600);
+        frame.setSize(700, 550);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
 
+        // ===== TITLE =====
+        JLabel title = new JLabel("Library Management System", JLabel.CENTER);
+        title.setFont(new Font("Arial", Font.BOLD, 20));
+        title.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        frame.add(title, BorderLayout.NORTH);
+
+        // ===== BUTTON PANEL =====
         JPanel panel = new JPanel(new GridLayout(5, 2, 10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
         JButton addBook = new JButton("Add Book");
         JButton deleteBook = new JButton("Delete Book");
@@ -44,24 +51,24 @@ public class Main {
         panel.add(searchBook);
         panel.add(showBorrowed);
 
-        frame.add(panel, BorderLayout.NORTH);
+        frame.add(panel, BorderLayout.WEST);
 
-        // ===== TABLE SETUP =====
+        // ===== TABLE =====
         tableModel = new DefaultTableModel();
         table = new JTable(tableModel);
-        JScrollPane scrollPane = new JScrollPane(table);
+        JScrollPane scroll = new JScrollPane(table);
 
-        frame.add(scrollPane, BorderLayout.CENTER);
+        frame.add(scroll, BorderLayout.CENTER);
 
         // ===== ADD BOOK =====
         addBook.addActionListener(e -> {
             JTextField id = new JTextField();
-            JTextField title = new JTextField();
+            JTextField titleField = new JTextField();
             JTextField author = new JTextField();
 
             Object[] fields = {
                     "Book ID:", id,
-                    "Title:", title,
+                    "Title:", titleField,
                     "Author:", author
             };
 
@@ -71,7 +78,7 @@ public class Main {
                 try {
                     library.addBook(new Book(
                             Integer.parseInt(id.getText()),
-                            title.getText(),
+                            titleField.getText(),
                             author.getText()
                     ));
                     JOptionPane.showMessageDialog(frame, "Book added");
@@ -121,7 +128,7 @@ public class Main {
             }
         });
 
-        // ===== VIEW BOOKS (TABLE) =====
+        // ===== VIEW BOOKS =====
         viewBooks.addActionListener(e -> {
             tableModel.setRowCount(0);
             tableModel.setColumnIdentifiers(new String[]{"ID", "Title", "Author", "Available"});
@@ -136,7 +143,7 @@ public class Main {
             }
         });
 
-        // ===== VIEW MEMBERS (TABLE) =====
+        // ===== VIEW MEMBERS =====
         viewMembers.addActionListener(e -> {
             tableModel.setRowCount(0);
             tableModel.setColumnIdentifiers(new String[]{"ID", "Name"});
