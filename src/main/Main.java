@@ -5,17 +5,19 @@ import model.Member;
 import service.LibraryService;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
 public class Main {
 
     private static LibraryService library = new LibraryService();
-    private static JTextArea outputArea;
+    private static JTable table;
+    private static DefaultTableModel tableModel;
 
     public static void main(String[] args) {
 
         JFrame frame = new JFrame("Library Management System");
-        frame.setSize(650, 600);
+        frame.setSize(700, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
 
@@ -44,10 +46,12 @@ public class Main {
 
         frame.add(panel, BorderLayout.NORTH);
 
-        outputArea = new JTextArea();
-        outputArea.setEditable(false);
-        outputArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        frame.add(new JScrollPane(outputArea), BorderLayout.CENTER);
+        // ===== TABLE SETUP =====
+        tableModel = new DefaultTableModel();
+        table = new JTable(tableModel);
+        JScrollPane scrollPane = new JScrollPane(table);
+
+        frame.add(scrollPane, BorderLayout.CENTER);
 
         // ===== ADD BOOK =====
         addBook.addActionListener(e -> {
@@ -70,7 +74,7 @@ public class Main {
                             title.getText(),
                             author.getText()
                     ));
-                    outputArea.setText("Book added successfully\n");
+                    JOptionPane.showMessageDialog(frame, "Book added");
 
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(frame, "Invalid input");
@@ -80,12 +84,11 @@ public class Main {
 
         // ===== DELETE BOOK =====
         deleteBook.addActionListener(e -> {
-            String input = JOptionPane.showInputDialog("Enter Book ID to delete");
+            String input = JOptionPane.showInputDialog("Enter Book ID");
 
             try {
-                int id = Integer.parseInt(input);
-                library.deleteBook(id);
-                outputArea.setText("Book deleted successfully\n");
+                library.deleteBook(Integer.parseInt(input));
+                JOptionPane.showMessageDialog(frame, "Book deleted");
 
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(frame, "Invalid input");
@@ -110,7 +113,7 @@ public class Main {
                             Integer.parseInt(id.getText()),
                             name.getText()
                     ));
-                    outputArea.setText("Member added successfully\n");
+                    JOptionPane.showMessageDialog(frame, "Member added");
 
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(frame, "Invalid input");
@@ -118,20 +121,31 @@ public class Main {
             }
         });
 
-        // ===== VIEW BOOKS =====
+        // ===== VIEW BOOKS (TABLE) =====
         viewBooks.addActionListener(e -> {
-            outputArea.setText("=== Books ===\n");
+            tableModel.setRowCount(0);
+            tableModel.setColumnIdentifiers(new String[]{"ID", "Title", "Author", "Available"});
+
             for (Book b : library.getBooks()) {
-                outputArea.append(b.getId() + " - " + b.getTitle() +
-                        " - Available: " + b.isAvailable() + "\n");
+                tableModel.addRow(new Object[]{
+                        b.getId(),
+                        b.getTitle(),
+                        b.getAuthor(),
+                        b.isAvailable()
+                });
             }
         });
 
-        // ===== VIEW MEMBERS =====
+        // ===== VIEW MEMBERS (TABLE) =====
         viewMembers.addActionListener(e -> {
-            outputArea.setText("=== Members ===\n");
+            tableModel.setRowCount(0);
+            tableModel.setColumnIdentifiers(new String[]{"ID", "Name"});
+
             for (Member m : library.getMembers()) {
-                outputArea.append(m.getId() + " - " + m.getName() + "\n");
+                tableModel.addRow(new Object[]{
+                        m.getId(),
+                        m.getName()
+                });
             }
         });
 
@@ -153,7 +167,7 @@ public class Main {
                             Integer.parseInt(bookId.getText()),
                             Integer.parseInt(memberId.getText())
                     );
-                    outputArea.setText("Book borrowed successfully\n");
+                    JOptionPane.showMessageDialog(frame, "Book borrowed");
 
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(frame, "Invalid input");
@@ -167,7 +181,7 @@ public class Main {
 
             try {
                 library.returnBook(Integer.parseInt(input));
-                outputArea.setText("Book returned successfully\n");
+                JOptionPane.showMessageDialog(frame, "Book returned");
 
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(frame, "Invalid input");
@@ -178,22 +192,31 @@ public class Main {
         searchBook.addActionListener(e -> {
             String keyword = JOptionPane.showInputDialog("Enter keyword");
 
-            outputArea.setText("=== Search Results ===\n");
+            tableModel.setRowCount(0);
+            tableModel.setColumnIdentifiers(new String[]{"ID", "Title"});
+
             for (Book b : library.getBooks()) {
                 if (b.getTitle().toLowerCase().contains(keyword.toLowerCase())) {
-                    outputArea.append(b.getId() + " - " + b.getTitle() + "\n");
+                    tableModel.addRow(new Object[]{
+                            b.getId(),
+                            b.getTitle()
+                    });
                 }
             }
         });
 
         // ===== BORROWED =====
         showBorrowed.addActionListener(e -> {
-            outputArea.setText("=== Borrowed Books ===\n");
+            tableModel.setRowCount(0);
+            tableModel.setColumnIdentifiers(new String[]{"Book ID", "Due Date"});
+
             library.getTransactions().stream()
                     .filter(t -> !t.isReturned())
                     .forEach(t ->
-                            outputArea.append("Book ID: " + t.getBookId() +
-                                    " | Due: " + t.getDueDate() + "\n")
+                            tableModel.addRow(new Object[]{
+                                    t.getBookId(),
+                                    t.getDueDate()
+                            })
                     );
         });
 
