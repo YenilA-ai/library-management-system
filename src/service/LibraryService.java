@@ -23,7 +23,7 @@ public class LibraryService {
         loadMembers();
     }
 
-    // ================= LOAD =================
+    // ===== LOAD ======
     private void loadBooks() {
         try (BufferedReader br = new BufferedReader(new FileReader(BOOK_FILE))) {
             String line;
@@ -36,7 +36,6 @@ public class LibraryService {
                 ));
             }
         } catch (Exception e) {
-            // file may not exist first time
         }
     }
 
@@ -54,7 +53,7 @@ public class LibraryService {
         }
     }
 
-    // ================= SAVE =================
+    // ======= SAVE =======
     private void saveBooks() {
         try (PrintWriter pw = new PrintWriter(new FileWriter(BOOK_FILE))) {
             for (Book b : books) {
@@ -75,7 +74,7 @@ public class LibraryService {
         }
     }
 
-    // ================= ADD =================
+    // ====== ADD ========
     public void addBook(Book book) {
         for (Book b : books) {
             if (b.getId() == book.getId()) return; // prevent duplicate
@@ -92,13 +91,18 @@ public class LibraryService {
         saveMembers();
     }
 
-    // ================= DELETE =================
+    // ====== DELETE ==========
     public void deleteBook(int id) {
         books.removeIf(b -> b.getId() == id);
         saveBooks();
     }
 
-    // ================= GET =================
+    public void deleteMember(int id) {
+        members.removeIf(m -> m.getId() == id);
+        saveMembers();
+    }
+
+    // ======= GET ========
     public List<Book> getBooks() {
         return books;
     }
@@ -111,7 +115,7 @@ public class LibraryService {
         return transactions;
     }
 
-    // ================= FIND =================
+    // ======= FIND =======
     private Book findBook(int id) {
         for (Book b : books) {
             if (b.getId() == id) return b;
@@ -119,7 +123,7 @@ public class LibraryService {
         return null;
     }
 
-    // ================= BORROW =================
+    // ===== BORROW ======
     public void borrowBook(int bookId, int memberId) {
         Book book = findBook(bookId);
 
@@ -133,11 +137,11 @@ public class LibraryService {
                     LocalDate.now().plusDays(7)
             ));
 
-            saveBooks(); // update availability
+            saveBooks(); 
         }
     }
 
-    // ================= RETURN =================
+    // ======== RETURN ========
     public void returnBook(int bookId) {
         Book book = findBook(bookId);
 
